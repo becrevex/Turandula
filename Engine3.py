@@ -59,8 +59,6 @@ Domain = {'Cox Communications':[[24,24],[56,56],[0,63],[0,254]],
 
 arin_ranges = []
 
-
-
 def launch(count=30):
 	pop = Generator(count)
 	pop.bdc_p()
@@ -139,30 +137,30 @@ def r_resolve(ip):
 
 class Generator:
 	DNS_collect 	 = []
-        networks         = []
-        New_Targets      = {}
+	networks         = []
+	New_Targets      = {}
 	crawl_collection = []
 	scanned_hosts    = []
-        summary_hosts    = []
-        host_pool        = []
+	summary_hosts    = []
+	host_pool        = []
 
 	resolved_hosts   = []
 	arin_ranges	 = []
 
-        def __init__(self, number):									# A new instance generates a pool of random IPs
-		self.host_pool = []
-                x = 1
-                while x <= number:
-                        self.host_pool.append(random_IP())
-                        x = x + 1
-                print "\n[+] Indexed", len(self.host_pool), "Targets."
+	def __init__(self, number):									# A new instance generates a pool of random IPs
+	self.host_pool = []
+			x = 1
+			while x <= number:
+					self.host_pool.append(random_IP())
+					x = x + 1
+			print "\n[+] Indexed", len(self.host_pool), "Targets."
 #		print "Resolving IP addresses in background..."
-		p1 = Process(target=self.resolve_hosts)
-		p1.start()
-                for item in Port_Dict.keys():
-                    self.New_Targets[Port_Dict[item]] = []
-                print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
-		print "Resolving target IP addresses in the background..."
+	p1 = Process(target=self.resolve_hosts)
+	p1.start()
+			for item in Port_Dict.keys():
+				self.New_Targets[Port_Dict[item]] = []
+			print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
+	print "Resolving target IP addresses in the background..."
 
         def generate_new(self, number):
                 self.host_pool = []
@@ -173,7 +171,7 @@ class Generator:
                 print "Indexed", len(self.host_pool), "target IPs."
 
 
-        def generate_from_domain(self, number, domain='Cox Communications'):
+	def generate_from_domain(self, number, domain='Cox Communications'):
 		self.host_pool = []
 		x = 0
 		print range_domain
@@ -185,8 +183,6 @@ class Generator:
 			range_domain = domain
 			while x <= number:
 				self.host_pool.append(random_IP_domain(Domain[domain]))
-				
-
                 self.host_pool = []
                 x = 0
 		print range_domain
@@ -225,12 +221,12 @@ class Generator:
 		#brute force services
 	
 	# Resolves IP addresses in the host_pool	
-        def resolve_hosts(self):
-                collect = []
+	def resolve_hosts(self):
+		collect = []
 		hostname = ''
-                for item in self.host_pool:
+		for item in self.host_pool:
 			try:
-		                hostname = socket.gethostbyaddr(item)
+				hostname = socket.gethostbyaddr(item)
 				collect.append((hostname[2], hostname[0]))
 				#print hostname
 #				collect.append(hostname[2], hostname[0])
@@ -247,7 +243,7 @@ class Generator:
 		for item in collect:
 			print item
 			self.DNS_collect.append(item)                                
-                return collect
+		return collect
 
 	def resolve_net(self):
 		collect = []
@@ -293,8 +289,8 @@ class Generator:
 
 
 	def ping_sweep_nmap(self, host):
-                octets = string.split(host, ".")
-                net = octets[0]+"."+octets[1]+"."+octets[2]+".0/24"
+		octets = string.split(host, ".")
+		net = octets[0]+"."+octets[1]+"."+octets[2]+".0/24"
 		os.system("nmap -vv -T4 -sP " + net + " -oG ./ping_sweep.rsc")
 		file = open("./ping_sweep.rsc")
 		collect =[]
@@ -349,37 +345,37 @@ class Generator:
 			pkt = sr1(IP(dst=item)/TCP(sport=random.randint(21000,51000),dport=port,flags="S"),timeout=0.33, verbose=False)
 #			try:
 			if pkt != None:
-	                        if "SA" in string.split(pkt.summary()):
+				if "SA" in string.split(pkt.summary()):
 					print "RESP-"+pkt.summary()
-	                                self.New_Targets[svc_name].append(pkt.src)
-	                                #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
-	                                print "\n[*] ", svc_name, "service found: ", string.split(pkt.summary())[3], "\n"#, socket.gethostbyaddr(pkt.src)[0], "\n"
-		                elif "RA" in string.split(pkt.summary()):
-					print pkt.summary()
-	                                self.networks.append(pkt.src)
-	                                print "[+] New target network: ", string.split(pkt.summary())[3]
+					self.New_Targets[svc_name].append(pkt.src)
+					#self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
+					print "\n[*] ", svc_name, "service found: ", string.split(pkt.summary())[3], "\n"#, socket.gethostbyaddr(pkt.src)[0], "\n"
+				elif "RA" in string.split(pkt.summary()):
+						print pkt.summary()
+						self.networks.append(pkt.src)
+						print "[+] New target network: ", string.split(pkt.summary())[3]
 
 
-        def statistics(self):
-                print "******************************************"
+	def statistics(self):
+		print "******************************************"
 		print "*           Statistic Summary            *"
 		print "******************************************"
-                print "[+] New network segments discovered:     ", len(self.networks)
-                print "[+] Systems probed per cycle:            ", len(self.host_pool)
+				print "[+] New network segments discovered:     ", len(self.networks)
+				print "[+] Systems probed per cycle:            ", len(self.host_pool)
 		total = 0
 		for item in self.New_Targets.keys():
 			total = total + len(self.New_Targets[item])
 		print "[+] Total systems/services added:        ", total
 		print "------------------------------------------"
-                print "[+] Newly Added Services                  "
+				print "[+] Newly Added Services                  "
 		print "------------------"
-                for srv in self.New_Targets.keys():
+				for srv in self.New_Targets.keys():
 			if len(self.New_Targets[srv]) > 0:
 				print "\n[+] Target Service: ", srv
 				for item in self.New_Targets[srv]:
 					try:	
 						resolved_host = socket.gethostbyaddr(item)
-			                        print item, resolved_host[0]
+									print item, resolved_host[0]
 					except:
 						print item
 
@@ -402,9 +398,9 @@ class Generator:
 		x = 0
 		while x <= count:
 			proc = []
-	                p1 = Process(target=self.discovery(21))
-	                p2 = Process(target=self.discovery(22))
-	                p3 = Process(target=self.discovery(443))
+			p1 = Process(target=self.discovery(21))
+			p2 = Process(target=self.discovery(22))
+			p3 = Process(target=self.discovery(443))
 			proc = [p1, p2, p3]
 			for item in proc:
 				print "Starting process..."
@@ -416,8 +412,8 @@ class Generator:
 
 
 	def run(self, command):
-                p1 = Process('target=self.resolve_hosts')
-                p1.start()
+		p1 = Process('target=self.resolve_hosts')
+		p1.start()
 
 
 	def show_targets(self):
@@ -444,4 +440,5 @@ class Generator:
 
 			
 def console():
-	
+	pass
+
