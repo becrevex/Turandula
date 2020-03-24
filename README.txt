@@ -66,6 +66,7 @@ spider.statistics()                       # Displays the results of the previous
 
 About
 -----
-Created by Brent "q0m" Chambers of Cygiene Solutions
+Design and Initial Implementation by 
+Brent "q0m" Chambers of Cygiene Solutions
 www.cygienesolutions.com
 
