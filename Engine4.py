@@ -8,10 +8,12 @@ from scapy.all import *
 import socket
 import random
 import string
+import pickle
+import time
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Disable no route found warning
 from multiprocessing import Process
-import time
+
 
 Port_Dict = {20:'FTPD',
                 21:'FTP',
@@ -42,20 +44,20 @@ Port_Dict = {20:'FTPD',
                 5900:'VNC2'}
 
 Domain = {'Cox Communications':[[24,24],[56,56],[0,63],[0,254]],
-                'Sinopec':[[223,223],[118,119],[1,254],[1,254]],
-                'State Gate Corp of China':[[210,210],[77,77],[176,191],[1,254]],
-                'China Mobile':[[117,117],[128,191],[1,254],[1,254]],
-                'China Railway':[[70,70],[32,32],[64,127],[1,254]],
-                'Facebook':[[173,173],[252,252],[64,127],[0,254]],
-                'ChinaNET':[[42,0],[0,0],[0,3],[1,255]],
-                'Level3':[[4,4],[0,255],[0,255],[0,255]],
-                'TarassulISP':[[5,5],[0,0],[0,127],[0,255]],
-                'USAISC':[[6,6],[0,255],[0,255],[0,255]],
-                'DoDNetwork':[[7,7],[0,255],[0,255],[0,255]],
-                'IBM':[[9,9],[0,255],[0,255],[0,255]],
-                'COX-ATL':[[68,68],[0,15],[0,255],[0,255]],
-                'ATTNet':[[69,69],[0,0],[0,127],[0,255]],
-                'SprintWZ':[[70,70],[0,14],[0,255],[0,255]]}
+			'Sinopec':[[223,223],[118,119],[1,254],[1,254]],
+			'State Gate Corp of China':[[210,210],[77,77],[176,191],[1,254]],
+			'China Mobile':[[117,117],[128,191],[1,254],[1,254]],
+			'China Railway':[[70,70],[32,32],[64,127],[1,254]],
+			'Facebook':[[173,173],[252,252],[64,127],[0,254]],
+			'ChinaNET':[[42,0],[0,0],[0,3],[1,255]],
+			'Level3':[[4,4],[0,255],[0,255],[0,255]],
+			'TarassulISP':[[5,5],[0,0],[0,127],[0,255]],
+			'USAISC':[[6,6],[0,255],[0,255],[0,255]],
+			'DoDNetwork':[[7,7],[0,255],[0,255],[0,255]],
+			'IBM':[[9,9],[0,255],[0,255],[0,255]],
+			'COX-ATL':[[68,68],[0,15],[0,255],[0,255]],
+			'ATTNet':[[69,69],[0,0],[0,127],[0,255]],
+			'SprintWZ':[[70,70],[0,14],[0,255],[0,255]]}
 
 arin_ranges = []
 
@@ -64,7 +66,6 @@ def launch(count=30):
         pop.bdc_p()
         pop.statistics()
         return pop
-
 
 def random_IP():
         oct1 = random.randint(1,254)
@@ -143,24 +144,30 @@ class Generator:
         scanned_hosts    = []
         summary_hosts    = []
         host_pool        = []
-
         resolved_hosts   = []
         arin_ranges      = []
 
-        def __init__(self, number):                                                                     # A new instance generates a pool of random IPs
-                self.host_pool = []
-                x = 1
-                while x <= number:
-                        self.host_pool.append(random_IP())
-                        x = x + 1
-                print "\n[+] Indexed", len(self.host_pool), "Targets."
-#               print "Resolving IP addresses in background..."
-                p1 = Process(target=self.resolve_hosts)
-                p1.start()
-                for item in Port_Dict.keys():
-                        self.New_Targets[Port_Dict[item]] = []
-                print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
-                print "Resolving target IP addresses in the background..."
+
+		#***
+		# Name: Generator[constructor]()
+		# Description: A Generator object, once initialized will generate a pool of random IP's
+		# @param  - int number
+		# @return - None
+		# 
+		def __init__(self, number):            # A new instance generates a pool of random IPs
+				self.host_pool = []
+				x = 1
+				while x <= number:
+						self.host_pool.append(random_IP())
+						x = x + 1
+				print "\n[+] Indexed", len(self.host_pool), "targets."
+		#       print "Resolving IP addresses in background..."
+				p1 = Process(target=self.resolve_hosts)
+				p1.start()
+				for item in Port_Dict.keys():
+						self.New_Targets[Port_Dict[item]] = []
+				print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
+				print "Resolving target IP addresses in the background..."
 
         def generate_new(self, number):
                 self.host_pool = []
@@ -354,6 +361,34 @@ class Generator:
                                                 print pkt.summary()
                                                 self.networks.append(pkt.src)
                                                 print "[+] New target network: ", string.split(pkt.summary())[3]
+        # ****
+        # Name: smb_discovery()
+        # Description: Adding SMBv3 CVE-2020-0796 discovery capability. 
+        # @param  - int port (Default 445/tcp)
+        # @return - None
+        # 
+        def smb_discovery(self, port=445):
+                try:
+                        svc_name = Port_Dict[port]
+                        print "Discovering open target", svc_name, "services...."
+                except:
+                        svc_name = 'Other'
+                        print "Discovering open target services on port "+str(port)+" ..."
+                summary_hosts = []
+                new_hosts = []
+                for item in self.host_pool:
+                        pkt = sr1(IP(dst=item)/TCP(sport=random.randint(21000,51000),dport=port,flags="S"),timeout=0.33, verbose=False)
+#                       try:
+                        if pkt != None:
+                                if "SA" in string.split(pkt.summary()):
+                                        print "RESP-"+pkt.summary()
+                                        self.New_Targets[svc_name].append(pkt.src)
+                                        #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
+                                        print "\n[*] ", svc_name, "service found: ", string.split(pkt.summary())[3], "\n"#, socket.gethostbyaddr(pkt.src)[0], "\n"
+                                elif "RA" in string.split(pkt.summary()):
+                                                print pkt.summary()
+                                                self.networks.append(pkt.src)
+                                                print "[+] New target network: ", string.split(pkt.summary())[3]
 
 
         def statistics(self):
@@ -394,10 +429,10 @@ class Generator:
                 self.statistics()
 
 
-        def bdc_p(self, count=6, pool=400):
+        def bdc_p(self, count=6, pool=400):				# Basic Discovery Cycle Parallel Implementation
                 x = 0
                 while x <= count:
-                        proc = []
+                        proc = []t
                         p1 = Process(target=self.discovery(21))
                         p2 = Process(target=self.discovery(22))
                         p3 = Process(target=self.discovery(443))
@@ -427,6 +462,11 @@ class Generator:
                 pass
 
 
+		def save_instance(self, filename='instance.e4'):
+				object_pi = self.New_Targets
+				file_h = open(filename, 'w')
+				pickle.dump(object_pi, file_h)
+
         def save_data(self, filename=''):
                 workbook = xlwt.Workbook()
                 # Write the hosts in each to the sheets
@@ -440,4 +480,4 @@ class Generator:
 
 
 def console():
-        pass
+        os.system("/bin/bash")
