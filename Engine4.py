@@ -512,10 +512,10 @@ class Generator:
                 pass
 
 
-		def save_instance(self, filename='instance.e4'):
-				object_pi = self.New_Targets
-				file_h = open(filename, 'w')
-				pickle.dump(object_pi, file_h)
+        def save_instance(self, filename='instance.e4'):
+                        object_pi = self.New_Targets
+                        file_h = open(filename, 'w')
+                        pickle.dump(object_pi, file_h)
 
         def save_data(self, filename=''):
                 workbook = xlwt.Workbook()
