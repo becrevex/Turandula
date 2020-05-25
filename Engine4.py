@@ -463,6 +463,8 @@ class Generator:
                                                 print item, resolved_host[0]
                                         except:
                                                 print item
+                save_instance()
+                save_data()
 
 
         def bdc(self, count=6, pool=500):               # Basic Discovery Cycle: (FTP,SSH,HTTPS), Cycle=6, Pool=500)
@@ -517,7 +519,7 @@ class Generator:
                         file_h = open(filename, 'w')
                         pickle.dump(object_pi, file_h)
 
-        def save_data(self, filename=''):
+        def save_data(self, filename='instance.xls'):
                 workbook = xlwt.Workbook()
                 # Write the hosts in each to the sheets
                 for item in Port_Dict.keys():
