@@ -2,10 +2,14 @@
 
 >>> import Engine4
 >>> spider = Engine4.Generator(10)        # 10 == number of random IP's to generate 
-### spider will start resolving the randomly generated IP's when the object is created.
+
+spider will start resolving the randomly generated IP's when the object is created.
+
 >>> spider.bdc_p()                        # Default arguments are bdc_p(count=6, pool=250)
-### bdc_p() is a threaded function, performing the connection tests in parallel
+
+bdc_p() is a threaded function, performing the connection tests in parallel
 ---Output---
+
 Parallel Discovery Cycle starting...
 Discovering open target FTP services..
 Discovering open target SSH services..
