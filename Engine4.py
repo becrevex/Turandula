@@ -275,8 +275,8 @@ class Generator:
                 return collect
 
         # ****
-        # Name: resolve_hosts()
-        # Description: DNS resolution of existing hosts in the objects' host_pool
+        # Name: resolve_net()
+        # Description: DNS resolution of existing hosts within the object's network array
         # @param  - string host 
         # @return - None
         # 
@@ -294,6 +294,13 @@ class Generator:
 #                       collect.append((hostname[2],hostname[0]))
                 return collect
 
+
+        # ****
+        # Name: portscan_host()
+        # Description: Scapy implementation of a TCP SYN scan (1-1024)
+        # @param  - string host 
+        # @return - None
+        # 
         def portscan_host(self, host):
                 if self.is_up(host) == True:
                         resp = sr1(IP(dst=host)/TCP(sport=21000,dport=range(1,1024),flags="S"),timeout=0.27, verbose=False)
@@ -308,7 +315,12 @@ class Generator:
                 else:
                         print "Host is not alive."
 
-
+        # ****
+        # Name: portscan_host_nmap()
+        # Description: nmap system command of a TCP SYN scan (1-1024) (sloppy)
+        # @param  - string host 
+        # @return - None
+        # 
         def portscan_host_nmap(self, host):
                 os.system("nmap -vv -T4 -sS " + host + " -oG ./port_scan.rsc")
                 file = open("./port_scan.rsc")
@@ -352,7 +364,12 @@ class Generator:
                 #range = octets[0]+"."+octets[1]+"."+octets[2]+".0"+"/24"
                 #self.is_up(range)
 
-
+        # ****
+        # Name: is_up()
+        # Description: Scapy implementation of a ICMP ping to test host reachability
+        # @param  - string host / ip
+        # @return - None
+        # 
         def is_up(self, ip):
                 print "Pinging", ip
                 icmp = IP(dst=ip)/ICMP()
@@ -366,7 +383,12 @@ class Generator:
                 return True
 
 
-
+        # ****
+        # Name: discovery()
+        # Description: TCP port probe of a each host in the host_pool
+        # @param  - string host 
+        # @return - None
+        # 
         def discovery(self, port):
                 try:
                         svc_name = Port_Dict[port]
