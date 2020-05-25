@@ -482,7 +482,7 @@ class Generator:
         def bdc_p(self, count=6, pool=400):				# Basic Discovery Cycle Parallel Implementation
                 x = 0
                 while x <= count:
-                        proc = []
+                        proc = [] 
                         p1 = Process(target=self.discovery(21))
                         p2 = Process(target=self.discovery(22))
                         p3 = Process(target=self.discovery(443))
