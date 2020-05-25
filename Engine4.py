@@ -44,20 +44,20 @@ Port_Dict = {20:'FTPD',
                 5900:'VNC2'}
 
 Domain = {'Cox Communications':[[24,24],[56,56],[0,63],[0,254]],
-			'Sinopec':[[223,223],[118,119],[1,254],[1,254]],
-			'State Gate Corp of China':[[210,210],[77,77],[176,191],[1,254]],
-			'China Mobile':[[117,117],[128,191],[1,254],[1,254]],
-			'China Railway':[[70,70],[32,32],[64,127],[1,254]],
-			'Facebook':[[173,173],[252,252],[64,127],[0,254]],
-			'ChinaNET':[[42,0],[0,0],[0,3],[1,255]],
-			'Level3':[[4,4],[0,255],[0,255],[0,255]],
-			'TarassulISP':[[5,5],[0,0],[0,127],[0,255]],
-			'USAISC':[[6,6],[0,255],[0,255],[0,255]],
-			'DoDNetwork':[[7,7],[0,255],[0,255],[0,255]],
-			'IBM':[[9,9],[0,255],[0,255],[0,255]],
-			'COX-ATL':[[68,68],[0,15],[0,255],[0,255]],
-			'ATTNet':[[69,69],[0,0],[0,127],[0,255]],
-			'SprintWZ':[[70,70],[0,14],[0,255],[0,255]]}
+        'Sinopec':[[223,223],[118,119],[1,254],[1,254]],
+        'State Gate Corp of China':[[210,210],[77,77],[176,191],[1,254]],
+        'China Mobile':[[117,117],[128,191],[1,254],[1,254]],
+        'China Railway':[[70,70],[32,32],[64,127],[1,254]],
+        'Facebook':[[173,173],[252,252],[64,127],[0,254]],
+        'ChinaNET':[[42,0],[0,0],[0,3],[1,255]],
+        'Level3':[[4,4],[0,255],[0,255],[0,255]],
+        'TarassulISP':[[5,5],[0,0],[0,127],[0,255]],
+        'USAISC':[[6,6],[0,255],[0,255],[0,255]],
+        'DoDNetwork':[[7,7],[0,255],[0,255],[0,255]],
+        'IBM':[[9,9],[0,255],[0,255],[0,255]],
+        'COX-ATL':[[68,68],[0,15],[0,255],[0,255]],
+        'ATTNet':[[69,69],[0,0],[0,127],[0,255]],
+        'SprintWZ':[[70,70],[0,14],[0,255],[0,255]]}
 
 arin_ranges = []
 
@@ -134,8 +134,6 @@ def resolve(hostname):
 def r_resolve(ip):
         return socket.gethostbyaddr(ip)
 
-
-
 class Generator:
         DNS_collect      = []
         networks         = []
@@ -148,27 +146,33 @@ class Generator:
         arin_ranges      = []
 
 
-		#***
-		# Name: Generator[constructor]()
-		# Description: A Generator object, once initialized will generate a pool of random IP's
-		# @param  - int number
-		# @return - None
-		# 
-		def __init__(self, number):            # A new instance generates a pool of random IPs
-				self.host_pool = []
-				x = 1
-				while x <= number:
-						self.host_pool.append(random_IP())
-						x = x + 1
-				print "\n[+] Indexed", len(self.host_pool), "targets."
-		#       print "Resolving IP addresses in background..."
-				p1 = Process(target=self.resolve_hosts)
-				p1.start()
-				for item in Port_Dict.keys():
-						self.New_Targets[Port_Dict[item]] = []
-				print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
-				print "Resolving target IP addresses in the background..."
+        #***
+        # Name: Generator[constructor]()
+        # Description: A Generator object, once initialized will generate a pool of random IP's
+        # @param  - int number
+        # @return - None
+        # 
+        def __init__(self, number):            # A new instance generates a pool of random IPs
+                self.host_pool = []
+                x = 1
+                while x <= number:
+                                self.host_pool.append(random_IP())
+                                x = x + 1
+                print "\n[+] Indexed", len(self.host_pool), "targets."
+                #print "Resolving IP addresses in background..."
+                p1 = Process(target=self.resolve_hosts)
+                p1.start()
+                for item in Port_Dict.keys():
+                                self.New_Targets[Port_Dict[item]] = []
+                print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
+                print "Resolving target IP addresses in the background..."
 
+        # ****
+        # Name: generate_new()
+        # Description: Generates a pool of randomized IP addresses.   
+        # @param  - int number [the size of the IP pool]
+        # @return - None
+        # 
         def generate_new(self, number):
                 self.host_pool = []
                 x = 1
@@ -177,7 +181,12 @@ class Generator:
                         x = x + 1
                 print "Indexed", len(self.host_pool), "target IPs."
 
-
+        # ****
+        # Name: generate_from_domain()
+        # Description: Generates a pool of randomized IP addresses within a domain/network range  
+        # @param  - int number [the size of the IP pool], string domain [domain from dict]
+        # @return - None
+        # 
         def generate_from_domain(self, number, domain='Cox Communications'):
                 self.host_pool = []
                 x = 0
@@ -198,6 +207,12 @@ class Generator:
                         x = x + 1
                 print "Indexed", len(self.host_pool), "targets."
 
+        # ****
+        # Name: generate_from_range()
+        # Description: Generates a pool of randomized IP addresses from a hyphenated range string  
+        # @param  - int number [the size of the IP pool], string range [IP range (ex. 192.168.0.11-192.168.5.90)]
+        # @return - None
+        # 
         def generate_from_range(self, number, range):
                 self.host_pool = []
                 x = 1
@@ -211,6 +226,12 @@ class Generator:
                 print "Indexed", len(self.host_pool), "targets."
 
 
+        # ****
+        # Name: interrogate_net()
+        # Description: Take a network range, and performs general recon and enumeration  
+        # @param  - string network-range (or IP, which is then stripped for a C class /24 by default)
+        # @return - Data Structure with network attributes and characteristics
+        # 
         def interrogate_net(self):
                 #dns resolve the collection
                 #network sweep the network
@@ -218,7 +239,12 @@ class Generator:
 
                 pass
 
-
+        # ****
+        # Name: interrogate_host()
+        # Description: Perfrom general recon and enumeration of the provided host and its attack surface  
+        # @param  - string host 
+        # @return - None
+        # 
         def interrogate_host(self, host):
                 pass
                 #dns resolve the host
@@ -227,7 +253,12 @@ class Generator:
                 #various nmap/python scripts
                 #brute force services
 
-        # Resolves IP addresses in the host_pool
+        # ****
+        # Name: resolve_hosts()
+        # Description: DNS resolution of existing hosts in the objects' host_pool
+        # @param  - string host 
+        # @return - None
+        # 
         def resolve_hosts(self):
                 collect = []
                 hostname = ''
@@ -235,23 +266,20 @@ class Generator:
                         try:
                                 hostname = socket.gethostbyaddr(item)
                                 collect.append((hostname[2], hostname[0]))
-                                #print hostname
-#                               collect.append(hostname[2], hostname[0])
-#                               print hostname[0], hostname[2]
-#                               self.resolved_hosts.append((hostname[2], hostname[0]))
                         except:
                                 pass
-
-#                       self.resolved_hosts.append((hostname[2], hostname[0]))
-                                #print hostname[2], hostname[0]
-#               for item in collect:
-#                       print item
                 print "Resolved", len(collect), "Targets. \nSee 'self.resolved_hosts'"
                 for item in collect:
                         print item
                         self.DNS_collect.append(item)
                 return collect
 
+        # ****
+        # Name: resolve_hosts()
+        # Description: DNS resolution of existing hosts in the objects' host_pool
+        # @param  - string host 
+        # @return - None
+        # 
         def resolve_net(self):
                 collect = []
                 for item in self.networks:
