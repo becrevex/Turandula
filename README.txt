@@ -1,15 +1,12 @@
-Background
-----------
-
-Random target generator for network discovery, threat landscaping, and playing AIC (adversarial informatics combat).  Turandula came to me while I was suffering through a Linux class that was required for my Systems Programming degree.  The idea of finding random and interestnig services on the Internet always interested me, so I whipped together the core functionality of generating a random IP address and testing it for service reachability.  The rest of the project grew from there.  
-
-Basic usage:
+## Basic usage:
 
 >>> import Engine4
 >>> spider = Engine4.Generator(10)        # 10 == number of random IP's to generate 
-### spider will start resolving the randomly generated IP's when the object is created.
+spider will start resolving the randomly generated IP's when the object is created.
 >>> spider.bdc_p()                        # Default arguments are bdc_p(count=6, pool=250)
-### bdc_p() is a threaded function, performing the connection tests in parallel
+
+bdc_p() is a threaded function, performing the connection tests in parallel
+
 ---Output---
 Parallel Discovery Cycle starting...
 Discovering open target FTP services..
