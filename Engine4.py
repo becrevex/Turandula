@@ -577,7 +577,7 @@ class Generator:
         def save_service(self, filename='services.e4'):
 			timestamp = time.strftime("%Y%m%d-%H%M%S")
                         object_pi = self.New_Targets
-			services_file = open(filename, "a+")
+			services_file = open(filename, "w")
                         #file_h = open("Discovery_probe_"+timestamp+".e4", 'w')
                         pickle.dump(object_pi, services_file)
 			print_green("[+] Discovered services file updated.")
@@ -586,7 +586,7 @@ class Generator:
 
         def save_network(self, filename='networks.e4'):
                         object_pi = self.networks
-			networks_file = open(filename, "a+")
+			networks_file = open(filename, "w")
                         #file_h = open("Discovery_networks_"+timestamp+".e4", 'w')
                         pickle.dump(object_pi, networks_file)
                         print_green("[+] Discovered networks file updated.")
