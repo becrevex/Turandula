@@ -6,6 +6,7 @@
 from scapy.all import *
 from ipaddress import IPv4Network
 #import xlwt
+import sys
 import socket
 import random
 import string
@@ -257,7 +258,7 @@ class Generator:
 
         # ****
         # Name: generate_from_range()
-        # Description: Generates a pool of randomized IP addresses from a hyphenated range string  
+        # Description: Generates a pool of randomized IP addresses from a hyphenated range string
         # @param  - int number [the size of the IP pool], string range [IP range (ex. 192.168.0.11-192.168.5.90)]
         # @return - None
         # 
@@ -276,7 +277,7 @@ class Generator:
 
         # ****
         # Name: interrogate_net()
-        # Description: Take a network range, and performs general recon and enumeration  
+        # Description: Take a network range, and performs general recon and enumeration
         # @param  - string network-range (or IP, which is then stripped for a C class /24 by default)
         # @return - Data Structure with network attributes and characteristics
         # 
@@ -289,7 +290,7 @@ class Generator:
 
         # ****
         # Name: interrogate_host()
-        # Description: Perfrom general recon and enumeration of the provided host and its attack surface  
+        # Description: Perfrom general recon and enumeration of the provided host and its attack surface
         # @param  - string host 
         # @return - None
         # 
@@ -470,9 +471,9 @@ class Generator:
         # ****
         # Name: discovery()
         # Description: TCP port probe of a each host in the host_pool
-        # @param  - string host 
+        # @param  - string host
         # @return - None
-        # 
+        #
         def discovery(self, port):
                 try:
                         svc_name = Port_Dict[port]
@@ -485,17 +486,20 @@ class Generator:
                 for item in self.host_pool:
                         pkt = sr1(IP(dst=item)/TCP(sport=random.randint(21000,51000),dport=port,flags="S"),timeout=0.33, verbose=False)
 			print "Probing: " + item + ":" + str(port)
+#                        #print '{}\r'.format("Probing: "+item+":"+str(port))
+#			sys.stdout.write('\r' + str('Probing: ' + item + ':' + str(port)) + ' '*9)
+#                        sys.stdout.flush()
 #                       try:
                         if pkt != None:
                                 if "SA" in string.split(pkt.summary()):
-                                        print "RESP-"+pkt.summary()
+                                        #print "RESP-"+pkt.summary()
                                         self.New_Targets[svc_name].append(pkt.src)
                                         #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
                                         print_cyan( "[*] " + svc_name + " service found: " + string.split(pkt.summary())[3])   #, socket.gethostbyaddr(pkt.src)[0], "\n"
                                         try:
                                              print_blue("[+] Hostname: " + r_resolve(pkt.src)[0])
                                         except:
-                                             print("Nah")
+                                             print("[+] Hostname: could not resolve")
 					self.save_service()
                                 elif "RA" in string.split(pkt.summary()):
                                                 #print pkt.summary()
@@ -506,9 +510,9 @@ class Generator:
                                                 #print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
                                                 print_yellow("[+] New potential target network: " + netwk_range)
                                                 try:
-                                                    print_blue("[+] Hostname: ", r_resolve(pkt.src)[0])
+                                                    print_blue("[+] Hostname ("+pkt.src+"): " + r_resolve(pkt.src)[0])
                                                 except:
-                                                    print("Nah")
+                                                    print("[!] Hostname: could not resolve")
                                                 self.save_network()
         # ****
         # Name: smb_discovery()
