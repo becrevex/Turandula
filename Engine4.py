@@ -88,6 +88,12 @@ def print_red(input_text):
 def print_yellow(input_text):
 	print(bcolors.WARNING + input_text + bcolors.ENDC)
 
+def print_bold(input_text):
+	print(bcolors.BOLD + input_text + bcolors.ENDC)
+
+def print_blue(input_text):
+	print(bcolors.OKBLUE + input_text + bcolors.ENDC)
+
 def launch(count=30):
         pop = Generator(count)
         pop.bdc_p()
@@ -153,13 +159,17 @@ def update_ranges(start=1, end=21):
 def random_range(range):                #24.56.0.0-24.56.63.255
         start = string.split(range, "-")[0]
         end   = string.split(range, "-")[1]
+
         oct1 = random.randint(string.split(start, "."))
 
 def resolve(hostname):
         return socket.gethostbyname(hostname)
 
 def r_resolve(ip):
-        return socket.gethostbyaddr(ip)
+        try:
+             return socket.gethostbyaddr(ip)
+        except:
+             pass
 
 class Generator:
         DNS_collect      = []
@@ -482,6 +492,10 @@ class Generator:
                                         self.New_Targets[svc_name].append(pkt.src)
                                         #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
                                         print_cyan( "[*] " + svc_name + " service found: " + string.split(pkt.summary())[3])   #, socket.gethostbyaddr(pkt.src)[0], "\n"
+                                        try:
+                                             print_blue("[+] Hostname: " + r_resolve(pkt.src)[0])
+                                        except:
+                                             print("Nah")
 					self.save_service()
                                 elif "RA" in string.split(pkt.summary()):
                                                 #print pkt.summary()
@@ -491,6 +505,10 @@ class Generator:
                                                 self.networks.append(netwk_range)
                                                 #print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
                                                 print_yellow("[+] New potential target network: " + netwk_range)
+                                                try:
+                                                    print_blue("[+] Hostname: ", r_resolve(pkt.src)[0])
+                                                except:
+                                                    print("Nah")
                                                 self.save_network()
         # ****
         # Name: smb_discovery()
