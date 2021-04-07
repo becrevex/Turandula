@@ -4,6 +4,7 @@
 #Description: Brute Force Discovery Engine (BFDE)
 
 from scapy.all import *
+from ipaddress import IPv4Network
 #import xlwt
 import socket
 import random
@@ -83,6 +84,9 @@ def print_cyan(input_text):
 
 def print_red(input_text):
 	print(bcolors.FAIL + input_text + bcolors.ENDC)
+
+def print_yellow(input_text):
+	print(bcolors.WARNING + input_text + bcolors.ENDC)
 
 def launch(count=30):
         pop = Generator(count)
@@ -174,7 +178,7 @@ class Generator:
         # Description: A Generator object, once initialized will generate a pool of random IP's
         # @param  - int number
         # @return - None
-        # 
+        #
         def __init__(self, number):            # A new instance generates a pool of random IPs
                 self.host_pool = []
                 x = 1
@@ -189,12 +193,12 @@ class Generator:
                                 self.New_Targets[Port_Dict[item]] = []
 		try:
 			self.New_Targets = self.load_services()
-			print_green("Saved service object " + `self.New_Targets` + " loaded.")
+			#print_green("Saved service object " + self.New_Targets + " loaded.")
 		except:
 			print_red("Could not load saved service object.")
 		try:
 			self.networks = self.load_networks()
-			print_green("Saved network target object " + `self.networks` + " loaded.")
+			#print_green("Saved network target object " + self.networks + " loaded.")
 		except:
 			print_red("Could not load saved networks object.")
 
@@ -203,7 +207,7 @@ class Generator:
 
         # ****
         # Name: generate_new()
-        # Description: Generates a pool of randomized IP addresses.   
+        # Description: Generates a pool of randomized IP addresses.
         # @param  - int number [the size of the IP pool]
         # @return - None
         # 
@@ -417,6 +421,42 @@ class Generator:
                 return True
 
 
+	# Description: Scapy implementation of an ICMP ping sweep
+	# @param - string CIDR_network e.g. 192.168.0.0/24
+	# @return - None
+	#
+        def ping_sweep(self, network):
+                addresses = IPv4Network(network)
+                live_count = 0
+
+                for host in addresses:
+                    if(host in (addresses.network_address, addresses.broadcast_address)):
+                        continue
+
+                    resp = sr1( IP(dst=str(host)) / ICMP(), timeout=1.21, iface='eth0', verbose=0 )
+                    if resp is None:
+                        pass
+                        #print(host, " is down or not responding.")
+                    else:
+                        print(host, resp.getlayer(ICMP).type)
+                    """
+                    if resp is None:
+                        break
+                        #print(host, " is down or not responding.")
+
+                    elif (int(resp.getlayer(ICMP).type)==3 and int(resp.getlayer(ICMP).code) in [1,2,3,9,10,13]):
+                        break
+                        #print(host, " is blocking ICMP.")
+
+                    else:
+                        print(host, "alive.")
+                        live_count += 1
+                    """
+                #print_green(str(live_count) + addresses.num_addresses + " hosts are online.")
+
+
+
+
         # ****
         # Name: discovery()
         # Description: TCP port probe of a each host in the host_pool
@@ -445,8 +485,12 @@ class Generator:
 					self.save_service()
                                 elif "RA" in string.split(pkt.summary()):
                                                 #print pkt.summary()
-                                                self.networks.append(pkt.src)
-                                                print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
+                                                netwk = ('.'.join(pkt.src.split(".")[:3]))+".0/24"
+                                                netwk_range = ('.'.join(pkt.src.split(".")[:3])) + ".0-" + ('.'.join(pkt.src.split(".")[:3])) +  ".254"
+                                                #self.networks.append(pkt.src)
+                                                self.networks.append(netwk_range)
+                                                #print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
+                                                print_yellow("[+] New potential target network: " + netwk_range)
                                                 self.save_network()
         # ****
         # Name: smb_discovery()
@@ -597,9 +641,10 @@ class Generator:
 			file_h = open("Discovery_probe_"+timestamp+".e4", "w")
 			file_i = open("Network_probe_"+timestamp+".e4", "w")
 			pickle.dump(self.New_Targets, file_h)
-			print_green("Discovered services file saved at: ", timestamp)
+			print_green("Discovered services file saved at: " + timestamp)
+
 			pickle.dump(self.networks, file_i)
-			print_green("Discovered networks file saved at: ", timestamp) 
+			print_green("Discovered networks file saved at: " + timestamp)
 			file_h.close()
 			file_i.close()
 
