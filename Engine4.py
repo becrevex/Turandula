@@ -44,7 +44,7 @@ Port_Dict = {20:'FTPD',
                 5432:'POSTGRESQL',
                 5500:'VNC1',
                 5900:'VNC2',
-		'Networks':'CIDR'}
+        'Networks':'CIDR'}
 
 class bcolors:
     HEADER = '\033[95m'
@@ -78,22 +78,22 @@ Domain = {'Cox Communications':[[24,24],[56,56],[0,63],[0,254]],
 arin_ranges = []
 
 def print_green(input_text):
-	print(bcolors.OKGREEN + input_text + bcolors.ENDC)
+    print(bcolors.OKGREEN + input_text + bcolors.ENDC)
 
 def print_cyan(input_text):
-	print(bcolors.OKCYAN + input_text + bcolors.ENDC)
+    print(bcolors.OKCYAN + input_text + bcolors.ENDC)
 
 def print_red(input_text):
-	print(bcolors.FAIL + input_text + bcolors.ENDC)
+    print(bcolors.FAIL + input_text + bcolors.ENDC)
 
 def print_yellow(input_text):
-	print(bcolors.WARNING + input_text + bcolors.ENDC)
+    print(bcolors.WARNING + input_text + bcolors.ENDC)
 
 def print_bold(input_text):
-	print(bcolors.BOLD + input_text + bcolors.ENDC)
+    print(bcolors.BOLD + input_text + bcolors.ENDC)
 
 def print_blue(input_text):
-	print(bcolors.OKBLUE + input_text + bcolors.ENDC)
+    print(bcolors.OKBLUE + input_text + bcolors.ENDC)
 
 def launch(count=30):
         pop = Generator(count)
@@ -125,7 +125,7 @@ def source(url):
         try:
                 fd = urllib2.urlopen(req)
         except:
-                print "Inaccessible.  Syntax?  Proxy even?"
+                print("Inaccessible.  Syntax?  Proxy even?")
                 return
         while 1:
                 data = fd.read(3072)
@@ -135,13 +135,13 @@ def source(url):
                 return data
 
 def convert_range_to_domain(range_string):                      #"192.168.1.1-192.168.60.0"
-        ips = string.split(range_string, "-")
+        ips = range_string("-")
         start = ips[0]
         end   = ips[1]
         domain = []
-        for i in string.split(start, "."):                      #  You like it..  [[ , ],[ , ]
-                domain.append([int(i), int(string.split(end, ".")[string.split(start, ".").index(i)])])
-        print domain
+        for i in start.split("."):                      #  You like it..  [[ , ],[ , ]
+                domain.append([int(i), int(end.split(".")[start.split(".").index(i)])])
+        print(domain)
         return domain
 
 # Grabs Organization and IP Address Ranges from ARIN
@@ -151,17 +151,17 @@ def update_ranges(start=1, end=21):
         for oct1 in range(start,end):
                 site_source = source('https://whois.arin.net/rest/net/NET-'+str(oct1)+'-0-0-0-1')
                 xmap = xmltodict.parse(site_source)
-                print xmap['net']['name'], xmap['net']['startAddress']+"-"+xmap['net']['endAddress']
+                print(xmap['net']['name'], xmap['net']['startAddress']+"-"+xmap['net']['endAddress'])
                 collect.append((xmap['net']['name'], xmap['net']['startAddress']+"-"+xmap['net']['endAddress']))
                 for item in collect:
                         arin_ranges.append(item)
         return collect
 
 def random_range(range):                #24.56.0.0-24.56.63.255
-        start = string.split(range, "-")[0]
-        end   = string.split(range, "-")[1]
+        start = range.split("-")[0]
+        end   = range.split("-")[1]
 
-        oct1 = random.randint(string.split(start, "."))
+        oct1 = random.randint(start.split("."))
 
 def resolve(hostname):
         return socket.gethostbyname(hostname)
@@ -194,26 +194,26 @@ class Generator:
                 self.host_pool = []
                 x = 1
                 while x <= number:
-                                self.host_pool.append(random_IP())
-                                x = x + 1
+                        self.host_pool.append(random_IP())
+                        x = x + 1
                 print_green("\n[+] Indexed " + str(len(self.host_pool)) + " targets.")
                 #print "Resolving IP addresses in background..."
                 p1 = Process(target=self.resolve_hosts)
                 p1.start()
                 for item in Port_Dict.keys():
-                                self.New_Targets[Port_Dict[item]] = []
-		try:
-			self.New_Targets = self.load_services()
-			#print_green("Saved service object " + self.New_Targets + " loaded.")
-		except:
-			print_red("Could not load saved service object.")
-		try:
-			self.networks = self.load_networks()
-			#print_green("Saved network target object " + self.networks + " loaded.")
-		except:
-			print_red("Could not load saved networks object.")
-
-                print "[+] Discovery data structure complete. " + str(len(self.New_Targets.keys()))+ " target services available for interrogation.\n"
+                        self.New_Targets[Port_Dict[item]] = []
+                try:
+                                self.New_Targets = self.load_services()
+                    #print_green("Saved service object " + self.New_Targets + " loaded.")
+                except:
+                    print_red("Could not load saved service object.")
+                try:
+                    self.networks = self.load_networks()
+                    #print_green("Saved network target object " + self.networks + " loaded.")
+                except:
+                    print_red("Could not load saved networks object.")
+        
+                print("[+] Discovery data structure complete. " + str(len(self.New_Targets.keys())) + " target services available for interrogation.\n")
                 print_green("Resolving target IP addresses in the background...")
 
         # ****
@@ -228,7 +228,7 @@ class Generator:
                 while x <= number:
                         self.host_pool.append(random_IP())
                         x = x + 1
-                print "Indexed", len(self.host_pool), "target IPs."
+                print("Indexed", len(self.host_pool), "target IPs.")
 
         # ****
         # Name: generate_from_domain()
@@ -250,11 +250,11 @@ class Generator:
                                 self.host_pool.append(random_IP_domain(Domain[domain]))
                 self.host_pool = []
                 x = 0
-                print range_domain
+                print(range_domain)
                 while x <= number:
                         self.host_pool.append(random_IP_Domain(Domain[range_domain]))
                         x = x + 1
-                print "Indexed", len(self.host_pool), "targets."
+                print("Indexed", len(self.host_pool), "targets.")
 
         # ****
         # Name: generate_from_range()
@@ -268,11 +268,11 @@ class Generator:
                 try:
                         range_domain = convert_range_to_domain(range)
                 except:
-                        print "ex. \'58.203.33.12-58.203.33.181\'"
+                        print("ex. \'58.203.33.12-58.203.33.181\'")
                 while x <= number:
                         self.host_pool.append(random_IP_Domain(range_domain))
                         x = x + 1
-                print "Indexed", len(self.host_pool), "targets."
+                print("Indexed", len(self.host_pool), "targets.")
 
 
         # ****
@@ -317,9 +317,9 @@ class Generator:
                                 collect.append((hostname[2], hostname[0]))
                         except:
                                 pass
-                print "Resolved", len(collect), "Targets. \nSee 'self.resolved_hosts'"
+                print("Resolved", len(collect), "Targets. \nSee 'self.resolved_hosts'")
                 for item in collect:
-                        print item
+                        print(item)
                         self.DNS_collect.append(item)
                 return collect
 
@@ -335,7 +335,7 @@ class Generator:
                         try:
                                 hostname = socket.gethostbyaddr(item)
                                 collect.append((hostname[2], hostname[0]))
-                                print hostname
+                                print(hostname)
                         except:
                                 pass
                                 #hostname = "unknown host"
@@ -355,14 +355,14 @@ class Generator:
                         resp = sr1(IP(dst=host)/TCP(sport=21000,dport=range(1,1024),flags="S"),timeout=0.27, verbose=False)
                         #pkts = sr1(IP(dst=host)/TCP(sport=random.randint(21000,51000),dport=(Port_Dict.keys()),flags="S"),timeout=0.27)#, verbose=False)
                         pkts = resp
-                        print pkts
+                        print(pkts)
                         for item in pkts:
                                 try:
-                                        print item.summary()
+                                        print (item.summary())
                                 except:
                                         pass
                 else:
-                        print "Host is not alive."
+                        print("Host is not alive.")
 
         # ****
         # Name: portscan_host_nmap()
@@ -375,34 +375,34 @@ class Generator:
                 file = open("./port_scan.rsc")
                 collect = []
                 for item in file:
-                        sLine = string.split(item)
+                        sLine = item.split()
                         if sLine[0] == "Host:":
                                 collect.append(sLine)
                 for i in collect:
-                        print i
+                        print(i)
                 return collect
 
 
 
         def ping_sweep_nmap(self, host):
-                octets = string.split(host, ".")
+                octets = host.split(".")
                 net = octets[0]+"."+octets[1]+"."+octets[2]+".0/24"
                 os.system("nmap -vv -T4 -sP " + net + " -oG ./ping_sweep.rsc")
                 file = open("./ping_sweep.rsc")
                 collect =[]
                 for item in file:
-                        if string.split(item)[-1] == 'Up':
-                                collect.append(string.split(item)[1])
+                        if item.split()[-1] == 'Up':
+                                collect.append(item.split()[1])
                 for i in collect:
-                        print "Live host: ", i
+                        print("Live host: ", i)
                 return collect
 
 
         def ping_sweep(self, host):
-                octets = string.split(host, ".")
+                octets = host.split(".")
                 net = octets[0]+"."+octets[1]+"."+octets[2]
                 net_range = []
-                print "[*] Setting up scanner..."
+                print("[*] Setting up scanner...")
                 for item in range(1, 254):
                         if self.is_up(net+"."+str(item)) == True:
                                 self.crawl_collection.append(net+"."+str(item))#, socket.gethostbyaddr(net+"."+str(item))))
@@ -420,22 +420,22 @@ class Generator:
         # @return - None
         # 
         def is_up(self, ip):
-                print "Pinging", ip
+                print("Pinging", ip)
                 icmp = IP(dst=ip)/ICMP()
                 resp = sr1(icmp, timeout=.75, verbose=False)
                 if resp == None:
                         return False
                 else:
-                        pkt_sum = string.split(resp.summary())
-                        print "[+] " + resp.summary()
+                        pkt_sum = resp.summary().split()
+                        print("[+] " + resp.summary())
 
                 return True
 
 
-	# Description: Scapy implementation of an ICMP ping sweep
-	# @param - string CIDR_network e.g. 192.168.0.0/24
-	# @return - None
-	#
+    # Description: Scapy implementation of an ICMP ping sweep
+    # @param - string CIDR_network e.g. 192.168.0.0/24
+    # @return - None
+    #
         def ping_sweep(self, network):
                 addresses = IPv4Network(network)
                 live_count = 0
@@ -485,35 +485,31 @@ class Generator:
                 new_hosts = []
                 for item in self.host_pool:
                         pkt = sr1(IP(dst=item)/TCP(sport=random.randint(21000,51000),dport=port,flags="S"),timeout=0.33, verbose=False)
-			print "Probing: " + item + ":" + str(port)
-#                        #print '{}\r'.format("Probing: "+item+":"+str(port))
-#			sys.stdout.write('\r' + str('Probing: ' + item + ':' + str(port)) + ' '*9)
-#                        sys.stdout.flush()
-#                       try:
+                        print("Probing: " + item + ":" + str(port))
                         if pkt != None:
-                                if "SA" in string.split(pkt.summary()):
+                                if "SA" in pkt.summary().split():
                                         #print "RESP-"+pkt.summary()
                                         self.New_Targets[svc_name].append(pkt.src)
                                         #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
-                                        print_cyan( "[*] " + svc_name + " service found: " + string.split(pkt.summary())[3])   #, socket.gethostbyaddr(pkt.src)[0], "\n"
+                                        print_cyan( "[*] " + svc_name + " service found: " + pkt.summary().split()[3])   
                                         try:
                                              print_blue("[+] Hostname: " + r_resolve(pkt.src)[0])
                                         except:
                                              print("[+] Hostname: could not resolve")
-					self.save_service()
-                                elif "RA" in string.split(pkt.summary()):
-                                                #print pkt.summary()
-                                                netwk = ('.'.join(pkt.src.split(".")[:3]))+".0/24"
-                                                netwk_range = ('.'.join(pkt.src.split(".")[:3])) + ".0-" + ('.'.join(pkt.src.split(".")[:3])) +  ".254"
-                                                #self.networks.append(pkt.src)
-                                                self.networks.append(netwk_range)
-                                                #print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
-                                                print_yellow("[+] New potential target network: " + netwk_range)
-                                                try:
-                                                    print_blue("[+] Hostname ("+pkt.src+"): " + r_resolve(pkt.src)[0])
-                                                except:
-                                                    print("[!] Hostname: could not resolve")
-                                                self.save_network()
+                                        self.save_service()
+                                elif "RA" in pkt.summary().split():
+                                        #print pkt.summary()
+                                        netwk = ('.'.join(pkt.src.split(".")[:3]))+".0/24"
+                                        netwk_range = ('.'.join(pkt.src.split(".")[:3])) + ".0-" + ('.'.join(pkt.src.split(".")[:3])) +  ".254"
+                                        #self.networks.append(pkt.src)
+                                        self.networks.append(netwk_range)
+                                        #print_green("[+] New potential target network: " + string.split(pkt.summary())[3])
+                                        print_yellow("[+] New potential target network: " + netwk_range)
+                                        try:
+                                             print_blue("[+] Hostname ("+pkt.src+"): " + r_resolve(pkt.src)[0])
+                                        except:
+                                             print("[!] Hostname: could not resolve")
+                                        self.save_network()
         # ****
         # Name: smb_discovery()
         # Description: Adding SMBv3 CVE-2020-0796 discovery capability. 
@@ -523,68 +519,69 @@ class Generator:
         def smb_discovery(self, port=445):
                 try:
                         svc_name = Port_Dict[port]
-                        print "Discovering open target", svc_name, "services...."
+                        print("Discovering open target", svc_name, "services....")
                 except:
                         svc_name = 'Other'
-                        print "Discovering open target services on port "+str(port)+" ..."
+                        print("Discovering open target services on port "+str(port)+" ...")
                 summary_hosts = []
                 new_hosts = []
                 for item in self.host_pool:
                         pkt = sr1(IP(dst=item)/TCP(sport=random.randint(21000,51000),dport=port,flags="S"),timeout=0.33, verbose=False)
 #                       try:
                         if pkt != None:
-                                if "SA" in string.split(pkt.summary()):
-                                        print "RESP-"+pkt.summary()
+                                if "SA" in pkt.summary().split():
+                                        print("RESP-"+pkt.summary())
                                         self.New_Targets[svc_name].append(pkt.src)
                                         #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
-                                        print "\n[*] ", svc_name, "service found: ", string.split(pkt.summary())[3], "\n"#, socket.gethostbyaddr(pkt.src)[0], "\n"
-                                elif "RA" in string.split(pkt.summary()):
-                                                print pkt.summary()
+                                        print("\n[*] ", svc_name, "service found: ", pkt.summary().split()[3], "\n")
+                                        #, socket.gethostbyaddr(pkt.src)[0], "\n")
+                                elif "RA" in pkt.summary().split():
+                                                print(pkt.summary())
                                                 self.networks.append(pkt.src)
-                                                print "[+] New potential target network: ", string.split(pkt.summary())[3]
+                                                print("[+] New potential target network: ", pkt.summary().split()[3])
 
 
         def statistics(self):
-                print "******************************************"
-                print "*           Statistic Summary            *"
-                print "******************************************"
-                print "[+] New network segments discovered:     ", len(self.networks)
-                print "[+] Systems probed per cycle:            ", len(self.host_pool)
+                print( "******************************************")
+                print( "*           Statistic Summary            *")
+                print( "******************************************")
+                print( "[+] New network segments discovered:     ", len(self.networks))
+                print( "[+] Systems probed per cycle:            ", len(self.host_pool))
                 total = 0
                 for item in self.New_Targets.keys():
                         total = total + len(self.New_Targets[item])
-                print "[+] Total systems/services added:        ", total
-                print "------------------------------------------"
-                print "[+] Newly Added Services                  "
-                print "------------------"
+                print( "[+] Total systems/services added:        ", total)
+                print( "------------------------------------------")
+                print( "[+] Newly Added Services                  ")
+                print( "------------------")
                 for srv in self.New_Targets.keys():
                         if len(self.New_Targets[srv]) > 0:
-                                print "\n[+] Target Service: ", srv
+                                print("\n[+] Target Service: ", srv)
                                 for item in self.New_Targets[srv]:
                                         try:
                                                 resolved_host = socket.gethostbyaddr(item)
-                                                print item, resolved_host[0]
+                                                print(item, resolved_host[0])
                                         except:
-                                                print item
+                                                print(item)
 
 
         def bdc(self, count=6, pool=500):               # Basic Discovery Cycle: (FTP,SSH,HTTPS), Cycle=6, Pool=500)
                 x = 0
-                print "Basic Discovery Cycle starting..."
-                print "Passes: ", count
+                print("Basic Discovery Cycle starting...")
+                print("Passes: ", count)
                 while x <= count:
                      self.generate_new(pool)
                      self.discovery(21)
                      self.discovery(22)
                      self.discovery(443)
                      x = x + 1
-                     print "[+] Pass", x, "completed."
+                     print("[+] Pass", x, "completed.")
                 self.statistics()
 
 
-        def bdc_p(self, count=6, pool=400):				# Basic Discovery Cycle Parallel Implementation
-		print "Cycle count:     ", count
-		print "Host pool count: ", pool
+        def bdc_p(self, count=6, pool=400):                # Basic Discovery Cycle Parallel Implementation
+                print("Cycle count:     ", count)
+                print("Host pool count: ", pool)
                 x = 0
                 while x <= count:
                         proc = []
@@ -593,7 +590,7 @@ class Generator:
                         p3 = Process(target=self.discovery(443))
                         proc = [p1, p2, p3]
                         for item in proc:
-                                print "Starting process..."
+                                print( "Starting process...")
                                 item.start()
                         for item in proc:
                                 item.join()
@@ -601,17 +598,17 @@ class Generator:
                         self.generate_new(200)
 
 
-	def bdc_p_ssh(self, count=2, pool=400):                             # Basic Discovery Cycle for SSH hosts
-                print "[arg1] Cycle count:     ", count
-                print "[arg2] Host pool count: ", pool
+        def bdc_p_ssh(self, count=2, pool=400):                             # Basic Discovery Cycle for SSH hosts
+                print("[arg1] Cycle count:     ", count)
+                print("[arg2] Host pool count: ", pool)
                 x = 0
                 while x <= count:
                         proc = []
                         p1 = Process(target=self.discovery(22))
                         proc = [p1]
                         for item in proc:
-                                print "Starting process..."
-                                item.start()
+                                print("Starting process...")
+                        item.start()
                         for item in proc:
                                 item.join()
                         x = x + 1
@@ -624,51 +621,51 @@ class Generator:
 
 
         def show_targets(self):
-                print "Current Target Inventory"
-                print "************************"
+                print("Current Target Inventory")
+                print("************************")
                 for item in self.New_Targets.keys().sort():
-                        print item, "\n", "\t\t", self.New_Targets[item],
+                        print(item, "\n", "\t\t", self.New_Targets[item]),
 
 
         def load_services(self, filename='services.e4'):
                 with open(filename, "a+") as handle:
-			b = pickle.load(handle)
-		return b
+                    b = pickle.load(handle)
+                return b
 
-	def load_networks(self, filename='networks.e4'):
-		with open(filename, "a+") as handle:
-			b = pickle.load(handle)
-		return b
+
+        def load_networks(self, filename='networks.e4'):
+                with open(filename, "a+") as handle:
+                    b = pickle.load(handle)
+                return b
 
         def save_service(self, filename='services.e4'):
-			timestamp = time.strftime("%Y%m%d-%H%M%S")
-                        object_pi = self.New_Targets
-			services_file = open(filename, "w")
-                        #file_h = open("Discovery_probe_"+timestamp+".e4", 'w')
-                        pickle.dump(object_pi, services_file)
-			print_green("[+] Discovered services file updated.")
-			services_file.close()
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                object_pi = self.New_Targets
+                services_file = open(filename, "wb")
+                #file_h = open("Discovery_probe_"+timestamp+".e4", 'w')
+                pickle.dump(object_pi, services_file)
+                print_green("[+] Discovered services file updated.")
+                services_file.close()
 
 
         def save_network(self, filename='networks.e4'):
-                        object_pi = self.networks
-			networks_file = open(filename, "w")
-                        #file_h = open("Discovery_networks_"+timestamp+".e4", 'w')
-                        pickle.dump(object_pi, networks_file)
-                        print_green("[+] Discovered networks file updated.")
-			networks_file.close()
+                object_pi = self.networks
+                networks_file = open(filename, "wb")
+                #file_h = open("Discovery_networks_"+timestamp+".e4", 'w')
+                pickle.dump(object_pi, networks_file)
+                print_green("[+] Discovered networks file updated.")
+                networks_file.close()
 
-	def save_session(self):
-			timestamp = time.strftime("%Y%m%d-%H%M%S")
-			file_h = open("Discovery_probe_"+timestamp+".e4", "w")
-			file_i = open("Network_probe_"+timestamp+".e4", "w")
-			pickle.dump(self.New_Targets, file_h)
-			print_green("Discovered services file saved at: " + timestamp)
-
-			pickle.dump(self.networks, file_i)
-			print_green("Discovered networks file saved at: " + timestamp)
-			file_h.close()
-			file_i.close()
+        def save_session(self):
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
+                file_h = open("Discovery_probe_"+timestamp+".e4", "wb")
+                file_i = open("Network_probe_"+timestamp+".e4", "wb")
+                pickle.dump(self.New_Targets, file_h)
+                print_green("Discovered services file saved at: " + timestamp)
+                pickle.dump(self.networks, file_i)
+                print_green("Discovered networks file saved at: " + timestamp)
+                file_h.close()
+                file_i.close()
 
 
         def save_data(self, filename='instance.xls'):
