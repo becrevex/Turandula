@@ -542,18 +542,19 @@ class Generator:
 
 
         def statistics(self):
-                print( "******************************************")
-                print( "*           Statistic Summary            *")
-                print( "******************************************")
+                self.save_session()
+                print( "***********************************************")
+                print( "*                Statistic Summary            *")
+                print( "***********************************************")
                 print( "[+] New network segments discovered:     ", len(self.networks))
                 print( "[+] Systems probed per cycle:            ", len(self.host_pool))
                 total = 0
                 for item in self.New_Targets.keys():
                         total = total + len(self.New_Targets[item])
                 print( "[+] Total systems/services added:        ", total)
-                print( "------------------------------------------")
+                print( "-----------------------------------------------")
                 print( "[+] Newly Added Services                  ")
-                print( "------------------")
+                print( "--------------------------")
                 for srv in self.New_Targets.keys():
                         if len(self.New_Targets[srv]) > 0:
                                 print("\n[+] Target Service: ", srv)
@@ -563,6 +564,7 @@ class Generator:
                                                 print(item, resolved_host[0])
                                         except:
                                                 print(item)
+
 
 
         def bdc(self, count=6, pool=500):               # Basic Discovery Cycle: (FTP,SSH,HTTPS), Cycle=6, Pool=500)
@@ -642,23 +644,24 @@ class Generator:
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 object_pi = self.New_Targets
                 services_file = open(filename, "wb")
-                file_h = open("Discovery_probe_"+timestamp+".e4", 'wb')
+                #$file_h = open("Discovery_probe_"+timestamp+".e4", 'wb')
                 pickle.dump(object_pi, services_file)
-                pickle.dump(object_pi, file_h)
+                #pickle.dump(object_pi, file_h)
                 print_green("[+] Discovered services file updated.")
                 services_file.close()
-		file_h.close()
+                #file_h.close()
 
 
         def save_network(self, filename='networks.e4'):
+                timestamp = time.strftime("%Y%m%d-%H%M%S")
                 object_pi = self.networks
                 networks_file = open(filename, "wb")
-                file_h = open("Discovery_networks_"+timestamp+".e4", 'wb')
+                #file_h = open("Discovery_networks_"+timestamp+".e4", 'wb')
                 pickle.dump(object_pi, networks_file)
-                picket.dump(object_pi, file_h)
-		print_green("[+] Discovered networks file updated.")
+                #pickle.dump(object_pi, file_h)
+                print_green("[+] Discovered networks file updated.")
                 networks_file.close()
-		file_h.close()
+                #file_h.close()
 
         def save_session(self):
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
