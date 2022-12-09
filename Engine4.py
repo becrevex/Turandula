@@ -644,7 +644,7 @@ class Generator:
                 services_file = open(filename, "wb")
                 file_h = open("Discovery_probe_"+timestamp+".e4", 'wb')
                 pickle.dump(object_pi, services_file)
-		pickle.dump(object_pi, file_h)
+                pickle.dump(object_pi, file_h)
                 print_green("[+] Discovered services file updated.")
                 services_file.close()
 		file_h.close()
