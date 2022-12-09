@@ -491,7 +491,7 @@ class Generator:
                                         #print "RESP-"+pkt.summary()
                                         self.New_Targets[svc_name].append(pkt.src)
                                         #self.New_Targets[svc_name].append(string.split(pkt.summary())[3])
-                                        print_cyan( "[*] " + svc_name + " service found: " + pkt.summary().split()[3])   
+                                        print_cyan( "[*] " + svc_name + " service found: " + pkt.summary().split()[3])
                                         try:
                                              print_blue("[+] Hostname: " + r_resolve(pkt.src)[0])
                                         except:
@@ -642,19 +642,23 @@ class Generator:
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 object_pi = self.New_Targets
                 services_file = open(filename, "wb")
-                #file_h = open("Discovery_probe_"+timestamp+".e4", 'w')
+                file_h = open("Discovery_probe_"+timestamp+".e4", 'wb')
                 pickle.dump(object_pi, services_file)
+		pickle.dump(object_pi, file_h)
                 print_green("[+] Discovered services file updated.")
                 services_file.close()
+		file_h.close()
 
 
         def save_network(self, filename='networks.e4'):
                 object_pi = self.networks
                 networks_file = open(filename, "wb")
-                #file_h = open("Discovery_networks_"+timestamp+".e4", 'w')
+                file_h = open("Discovery_networks_"+timestamp+".e4", 'wb')
                 pickle.dump(object_pi, networks_file)
-                print_green("[+] Discovered networks file updated.")
+                picket.dump(object_pi, file_h)
+		print_green("[+] Discovered networks file updated.")
                 networks_file.close()
+		file_h.close()
 
         def save_session(self):
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
