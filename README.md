@@ -65,6 +65,3 @@ spider.statistics()                       # Displays the results of the previous
 <br>
 About<br>
 -----<br>
-Design and Initial Implementation by <br>
-Brent "q0m" Chambers of Cygiene Solutions<br>
-www.cygienesolutions.com<br>
