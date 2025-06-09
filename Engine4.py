@@ -1,4 +1,4 @@
-#Programmer: Brent E. Chambers
+#Programmer: becrevex
 #Date: June 17, 2016
 #Filename: Engine3.py
 #Description: Brute Force Discovery Engine (BFDE)
