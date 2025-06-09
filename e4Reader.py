@@ -1,4 +1,4 @@
-#Programmer: Brent E. Chambers
+#Programmer: becrevex
 #Date: December 7, 2022
 #Filename: e4Reader.py
 #Description: Tool to read Turandula Engine4 produced output files
