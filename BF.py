@@ -1,4 +1,3 @@
-#Programmer: Brent E. Chambers
 #Date: 6/20/2016
 #filename: BF.py
 #Description:  Brute Force Attack Class to conduct attacks
